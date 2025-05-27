@@ -103,7 +103,7 @@ if not_added_posts:
 
     for post_text in not_added_posts:
         # Original "here we go" check (can be kept or modified as needed)
-        if "real madrid" in post_text.lower():
+        if "here we go" in post_text.lower():
             print(f"'Here we go' detected: {post_text}")
 
             discord_webhook_send(DISCORD_WEBHOOK_URL,post_text)

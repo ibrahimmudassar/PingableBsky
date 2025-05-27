@@ -1,11 +1,10 @@
 import json
-import os
 import sys
 
 import atproto
 import gspread
 import pandas as pd
-from discord_webhook import DiscordEmbed, DiscordWebhook  # Added for Discord webhook
+from discord_webhook import DiscordEmbed, DiscordWebhook
 from environs import Env
 from google.oauth2.service_account import Credentials
 
@@ -18,9 +17,17 @@ env.read_env()
 
 def discord_webhook_send(DISCORD_WEBHOOK_URL, post_text):
     if DISCORD_WEBHOOK_URL:
+        #first one is for ping
+        webhook = DiscordWebhook(
+            url=DISCORD_WEBHOOK_URL,
+            content="<@&1376989070529400932>",
+        )
+        response = webhook.execute()
+
+        # second one is for post
         webhook = DiscordWebhook(url=DISCORD_WEBHOOK_URL)
         embed = DiscordEmbed(
-            description=post_text + " <@407021843246088204>",
+            description=post_text,
             color="58acff",  # Hex color #58acff (light blue)
         )
         embed.set_author(name="Fabrizio Romano")
@@ -42,8 +49,8 @@ def discord_webhook_send(DISCORD_WEBHOOK_URL, post_text):
 
 # Authentication
 client = atproto.Client()
-USERNAME = os.getenv("BSKY_USERNAME")
-PASSWORD = os.getenv("BSKY_PASSWORD")
+USERNAME = env("BSKY_USERNAME")
+PASSWORD = env("BSKY_PASSWORD")
 
 if not USERNAME or not PASSWORD:
     raise ValueError(
@@ -84,7 +91,10 @@ not_added_posts = []
 
 for post_item in posts:
     post = post_item.post
-    if post.record.text not in seen["tweet"].values and post.record.text not in not_added_posts:
+    if (
+        post.record.text not in seen["tweet"].values
+        and post.record.text not in not_added_posts
+    ):
         not_added_posts.append(post.record.text)
 
 # Discord Webhook URL
@@ -106,4 +116,4 @@ if not_added_posts:
         if "here we go" in post_text.lower():
             print(f"'Here we go' detected: {post_text}")
 
-            discord_webhook_send(DISCORD_WEBHOOK_URL,post_text)
+            discord_webhook_send(DISCORD_WEBHOOK_URL, post_text)

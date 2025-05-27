@@ -1,0 +1,6 @@
+atproto
+gspread
+pandas
+environs
+google-auth
+discord-webhook
